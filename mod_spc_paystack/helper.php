@@ -42,6 +42,42 @@ class ModSpcPaystackHelper{
 	 *
 	 * @return string
 	 */
+	public static function generate_new_code($length = 10){
+	  $characters = '06EFGHI9KL'.time().'MNOPJRSUVW01YZ923234'.time().'ABCD5678QXT';
+	  $charactersLength = strlen($characters);
+	  $randomString = '';
+	  for ($i = 0; $i < $length; $i++) {
+	      $randomString .= $characters[rand(0, $charactersLength - 1)];
+	  }
+	  return  "SPC".time().$randomString;
+	}
+	public static function check_code($code){
+		$db = JFactory::getDBO();
+
+		$query = $db->getQuery(true)
+		            ->select('*')
+		            ->from($db->quoteName('#__spc_transactions'))
+		            ->where('tx_rand_id = ' . $db->quote($code));
+		$db->setQuery($query);
+		$o_exist = $db->loadObjectList(); 
+		  if (count($o_exist) > 0) {
+		      $result = true;
+		  } else {
+		      $result = false;
+		  }
+
+	  return $result;
+	}
+	public static function generate_code(){
+	  $code = 0;
+	  $check = true;
+	  while ($check) {
+	      $code = ModSpcPaystackHelper::generate_new_code();
+	      $check = ModSpcPaystackHelper::check_code($code);
+	  }
+
+	  return $code;
+	}
 	public static function initializePayment($units){
 		$user = JFactory::getUser();
 		if (!$user->guest){
@@ -62,7 +98,7 @@ class ModSpcPaystackHelper{
 			$balance_after = $balance_before + $units;
 
 			// die();
-			$reference = "SPC".time();
+			$reference = ModSpcPaystackHelper::generate_code();
 			//Create data object
 			$row = new JObject();
 			$row->tx_user_id = $user->id;
@@ -73,7 +109,7 @@ class ModSpcPaystackHelper{
 			$row->tx_balance_after = $balance_after;
 			$row->tx_status = 'Pending';
 			$row->tx_gateway = 'Paystack';
-			$row->tx_memo = $units.' units of SMS on SMS portal via Paystack';
+			$row->tx_memo = $units.' units of SMS. Reference: '.$reference;
 			
 			//Insert new record into jos_book table.
 			$ret = $db->insertObject('#__spc_transactions', $row);
@@ -181,7 +217,7 @@ class ModSpcPaystackHelper{
 		$curdate = date_format($date, 'd-m-Y H:i:s');;
 		///
 		$txobject->tx_approved = $curdate;
-		$txobject->tx_gateway_response = $response;
+		$txobject->tx_gateway_response = "Reference:".$tx->tx_rand_id;
 		$result = JFactory::getDbo()->updateObject('#__spc_transactions', $txobject, 'tx_id');
 		
 		$result  = array( 'status' => "success",'message' => "Payment Successful");
