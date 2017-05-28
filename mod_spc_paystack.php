@@ -69,7 +69,8 @@ $js = <<<JS
 								success: function (response) {
 									$.unblockUI();
 									if (response.success && response.data.status == 'success'){
-										alert(' Successful ');
+										alert('Payment Successful');
+										window.location.reload();
 
 									}else{
 										alert(response.data.message);
