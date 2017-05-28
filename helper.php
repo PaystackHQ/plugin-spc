@@ -57,7 +57,7 @@ class ModSpcPaystackHelper{
 
 			// print_r($params);
 			$balance_before = ModSpcPaystackHelper::getBalance($user);
-			$multiplier = ModSpcPaystackHelper::getMultiplier($user);
+			$multiplier = ModSpcPaystackHelper::getMultiplier($units);
 			$amount = $multiplier*$units;
 			$balance_after = $balance_before + $units;
 
@@ -212,26 +212,53 @@ class ModSpcPaystackHelper{
 	}
 	public static function getMultiplier($amount)
 	{
-		
-		// print_r($result);
-		// $db =& JFactory::getDBO();
-		// $query = $db->getQuery(true);
-		// $query->select('*');
-		// $query->from('#__spc_prices'); 
-		// // $query->where('id = 1');   //put your condition here    
-		// $db->setQuery($query);
-		// //echo $db->getQuery();exit;//SQL query string  
-		// //check if error
-		// if ($db->getErrorNum()) {
-		//   echo $db->getErrorMsg();
-		//   exit;
-		// }
-		// loadRow()
-		// $records = $db->loadObjectList();
+		$singlemultiplier = 1;
+		$multipliers = ModSpcPaystackHelper::getMultipliers();
+		if (count($multipliers) > 0) {
+			foreach ($multipliers as $key => $multiplier) {
+				if (($amount >= $multiplier['left']) && ($amount <= $multiplier['right']) ) {
+					$singlemultiplier = $multiplier['amount'];
+				}
+			}
+		}
+		return $singlemultiplier;
 
-		// $first = $records[0];
-		// $settings = $first->price_setting;
-		return 19;
+		
+	}
+	public static function getMultipliers()
+	{
+		
+		$db = JFactory::getDBO();
+		$query = $db->getQuery(true);
+		$query->select('*');
+		$query->from('#__spc_prices'); 
+		$db->setQuery($query);
+		$records = $db->loadObjectList();
+		$multipliers = array();
+		$first = $records[0];
+		$settings = explode("\n", $first->price_setting);
+		if (count($settings) > 0) {
+			foreach ($settings as $key => $setting) {
+				if ($setting != "" && $setting != NULL  ) {
+					$arr = explode("-", $setting, 2);
+					$left = $arr[0];
+					$second = $arr[1];
+
+					$arr2 = explode("=", $second, 2);
+					$right = $arr2[0];
+					$amount = $arr2[1];
+					
+					$multipier  = array(
+						'left' => $left,
+						'right' => $right, 
+						'amount' =>  $amount
+					);
+					$multipliers[] = $multipier;
+				}
+				
+			}
+		}
+		return $multipliers;
 
 		
 	}

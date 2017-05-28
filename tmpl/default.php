@@ -19,6 +19,9 @@ $balance = ModSpcPaystackHelper::getBalance();
 if ($balance != null) {
 	echo "<p style='color:red;'>Your SMS balance is: ".$balance." units.</p>";
 }
+
+$multipliers = ModSpcPaystackHelper::getMultipliers();
+// print_r($multipliers);
 ?>
 
 <form method="post">
@@ -36,7 +39,7 @@ if ($balance != null) {
 
 <script type="text/javascript">
 (function ($) {
-	function number_format (number, decimals, dec_point, thousands_sep) {
+	function number_format(number, decimals, dec_point, thousands_sep) {
 
 	  number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
 
@@ -81,7 +84,15 @@ if ($balance != null) {
 		var n = jQuery('#ps_units').val().split(',').join('').split(' ').join('');
 		n = parseFloat(n);
 		unitcost = 1;
-		if( n >= 1 && n <= 10000) unitcost = 19; 	jQuery('#priceNGN').html('<h4>Amount: NGN '+number_format(n*unitcost,2)+'</h4>');
+		<?php if (count($multipliers) > 0) { 
+
+			foreach ($multipliers as $key => $multiplier) {
+		?>
+			if( n >= parseFloat(<?php echo $multiplier["left"]; ?>) && n <= parseFloat(<?php echo $multiplier["right"]; ?>)) unitcost = parseFloat(<?php echo $multiplier["amount"]; ?>); 	
+		<?php } } ?>
+		
+
+		jQuery('#priceNGN').html('<h4>Amount: NGN '+number_format(n*unitcost,2)+'</h4>');
 		return true;
 	});
 	})(jQuery)
