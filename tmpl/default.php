@@ -1,7 +1,7 @@
 <?php
 /**
-* @package    SpcPaystack
-* @author     DouglasKendyson
+* @package    Spc Paystack Plugin
+* @author     Douglas Kendyson
 * @copyright  Copyright2017-Paystack
 * @license    GNUGeneralPublicLicenseversion2orlaterseeLICENSE.txt
 **/
@@ -15,10 +15,13 @@ JHtml::_('behavior.keepalive');
 JHtml::_('bootstrap.tooltip');
 
 // print_r($params);
-
+$balance = ModSpcPaystackHelper::getBalance();
+if ($balance != null) {
+	echo "<p style='color:red;'>Your SMS balance is: ".$balance." units.</p>";
+}
 ?>
 
-<form method="post" onsubmit="return formAjax('atmForm','atmDiv');" action="http://sms.kendyson.com/component/spc/?comm=spc_buy_sms">
+<form method="post">
 	Get Credited Instantly<br>
 	<div class="label">No Of Units</div>
 	<input name="ps_units" id="ps_units"  class="form_element" placeholder="No of SMS Units" type="number" required>

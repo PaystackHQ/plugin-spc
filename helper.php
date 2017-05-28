@@ -16,11 +16,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
  *
  * @since       1.5
  */
-class ModSpcPaystackHelper
-{
+class ModSpcPaystackHelper{
 
-	public static function getAjax()
-	{
+	public static function getAjax(){
 		$result = array();
 		$input = JFactory::getApplication()->input;
 		$type  = $input->get('type');
@@ -44,39 +42,54 @@ class ModSpcPaystackHelper
 	 *
 	 * @return string
 	 */
-	public static function initializePayment($units)
-	{
+	public static function initializePayment($units){
 		$user = JFactory::getUser();
-		$db = JFactory::getDBO();
+		if (!$user->guest){
+			$db = JFactory::getDBO();
 
-		// print_r($params);
-		$balance_before = ModSpcPaystackHelper::getBalance($user);
-		$multiplier = ModSpcPaystackHelper::getMultiplier($user);
-		$amount = $multiplier*$units;
-		$balance_after = $balance_before + $units;
+			$params = ModSpcPaystackHelper::getParams();
+			
+			$key = $params['paystack_lpk'];
 
-		// die();
-		$reference = "SPC".time();
-		//Create data object
-		$row = new JObject();
-		$row->tx_user_id = $user->id;
-		$row->tx_email = $user->email;
-		$row->tx_reference = $reference;
-		$row->tx_balance_before = $balance_before;
-		$row->tx_units = $units;
-		$row->tx_multiplier = $multiplier;
-		$row->tx_amount = $amount;
-		$row->tx_balance_after = $balance_after;
-		$row->tx_status = 'pending';
-		
-		//Insert new record into jos_book table.
-		$ret = $db->insertObject('spc_paystack_transactions', $row);
-		 
-		//Get the new record id
-		$new_id = (int)$db->insertid();
-		$row->koboamount = $row->tx_amount*100;
-		$row->name = $user->name;
-		$row->name = $user->name;
+			if ($params['paystack_mode'] == 0) {
+				$key = $params['paystack_tpk'];
+			}
+
+			// print_r($params);
+			$balance_before = ModSpcPaystackHelper::getBalance($user);
+			$multiplier = ModSpcPaystackHelper::getMultiplier($user);
+			$amount = $multiplier*$units;
+			$balance_after = $balance_before + $units;
+
+			// die();
+			$reference = "SPC".time();
+			//Create data object
+			$row = new JObject();
+			$row->tx_user_id = $user->id;
+			$row->tx_rand_id = $reference;
+			$row->tx_balance_before = $balance_before;
+			$row->tx_unit = $units;
+			$row->tx_amount = $amount;
+			$row->tx_balance_after = $balance_after;
+			$row->tx_status = 'Pending';
+			$row->tx_gateway = 'Paystack';
+			$row->tx_memo = $units.' units of SMS on SMS portal via Paystack';
+			
+			//Insert new record into jos_book table.
+			$ret = $db->insertObject('#__spc_transactions', $row);
+			 
+			//Get the new record id
+			$new_id = (int)$db->insertid();
+			$row->koboamount = $row->tx_amount*100;
+			$row->name = $user->name." ";
+			$row->tx_email = $user->email;
+			$row->tx_multiplier = $multiplier;
+			$row->key = $key;
+			$row->status = 'success';
+			
+		}else{
+			$row  = array('status' => "failed", 'message' => 'You must be logged in to continue');
+		}
 
 		return $row;
 	}
@@ -94,37 +107,32 @@ class ModSpcPaystackHelper
 
 		$query = $db->getQuery(true)
 		            ->select('*')
-		            ->from('spc_paystack_transactions')
-		            ->where('tx_reference = ' . $reference);
+		            ->from($db->quoteName('#__spc_transactions'))
+		            ->where('tx_rand_id = ' . $db->quote($reference));
 		$db->setQuery($query);
-		if ($db->getErrorNum()) {
-		  echo $db->getErrorMsg();
-		  exit;
-		}
 		$result = $db->loadObjectList(); 
 		if (count($result) > 0) {
 			$tx = $result[0];
-			if ($tx->tx_status == 'pending') {
+			if ($tx->tx_status == 'Pending') {
 				
 				$api_response = ModSpcPaystackHelper::verifyTransaction($reference);
 
 				if ($api_response['result'] == 'success') {
 					$amount = $api_response['amount'];
 					if ($amount == $tx->tx_amount) {
-						$value_given = ModSpcPaystackHelper::giveUnits($tx);
-						echo "Time to update";
-						
+						$value_given = ModSpcPaystackHelper::giveUnits($tx,$api_response['response']);
+						$result = array('status' => "success", 'message' => 'Payment was successful');
 					}else{
-						$result = array( 'message' => 'Invalid amount paid');
+						$result = array('status' => "failed", 'message' => 'Invalid amount paid');
 					}
 				}else{
-					$result = array( 'message' => 'Transaction Not successful');
+					$result = array('status' => "failed", 'message' => 'Transaction Not successful');
 				}
 			}else{
-				$result = array( 'message' => 'Possible hack, reference has already been used');
+				$result = array('status' => "failed", 'message' => 'Possible hack, reference has already been used');
 			}
 		}else{
-			$result = array( 'message' => 'Possible hack, reference not found');
+			$result = array('status' => "failed", 'message' => 'Possible hack, reference not found');
 		}
 
 		return $result;
@@ -142,12 +150,10 @@ class ModSpcPaystackHelper
 		
 	}
 
-	public static function giveUnits($tx)
+	public static function giveUnits($tx,$response)
 	{
 		
-		print_r($tx);
-
-
+		
 		///Update credit; 
 		$db = JFactory::getDbo();
 		// Retrieve the shout
@@ -163,39 +169,33 @@ class ModSpcPaystackHelper
 		$xtra = $dbxtra[0];
 		$extraobject = new stdClass();
 		$extraobject->uxid = $xtra->uxid;
-		$extraobject->wallet = $xtra->wallet+$tx->tx_units;
+		$extraobject->wallet = $xtra->wallet+$tx->tx_unit;
 		$result = JFactory::getDbo()->updateObject('#__users_xtra', $extraobject, 'uxid');
 		///Update Payments table
 		$txobject = new stdClass();
 		$txobject->tx_id = $tx->tx_id;
-		$txobject->tx_status = 'paid';
-		$result = JFactory::getDbo()->updateObject('spc_paystack_transactions', $txobject, 'tx_id');
-		print_r($xtra);
-		// print_r($result);
-		// $db =& JFactory::getDBO();
-		// $query = $db->getQuery(true);
-		// $query->select('*');
-		// $query->from('#__spc_prices'); 
-		// // $query->where('id = 1');   //put your condition here    
-		// $db->setQuery($query);
-		// //echo $db->getQuery();exit;//SQL query string  
-		// //check if error
-		// if ($db->getErrorNum()) {
-		//   echo $db->getErrorMsg();
-		//   exit;
-		// }
-		// 
-		// $records = $db->loadObjectList();
-
-		// $first = $records[0];
-		// $settings = $first->price_setting;
-		return 19;
+		$txobject->tx_status = 'Approved';
+		///
+		jimport ('joomla.utilities.date');
+		$date = new JDate('now');
+		$curdate = date_format($date, 'd-m-Y H:i:s');;
+		///
+		$txobject->tx_approved = $curdate;
+		$txobject->tx_gateway_response = $response;
+		$result = JFactory::getDbo()->updateObject('#__spc_transactions', $txobject, 'tx_id');
+		
+		$result  = array( 'status' => "success",'message' => "Payment Successful");
+		return $result;
 
 		
 	}
-	public static function getBalance($user)
+	public static function getBalance($user = null)
 	{
-		// $user = JFactory::getUser();
+		
+		if ($user == null) {
+			$user = JFactory::getUser();
+		}
+
 		$db = JFactory::getDbo();
 		// Retrieve the shout
 		$query = $db->getQuery(true)
@@ -267,7 +267,7 @@ class ModSpcPaystackHelper
         }
         if ($result->data->status == "success") {
             $paid = $result->data->amount / 100;
-            $result = ['result' => 'success', 'amount' => $paid];
+            $result = ['result' => 'success', 'amount' => $paid,'response' => $result->data->gateway_response];
 
         } else {
             $result = ['result' => 'failed'];

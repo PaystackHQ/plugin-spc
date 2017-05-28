@@ -2,7 +2,7 @@
 <extension version="2.5" type="module" client="site" method="upgrade">
 	<name>Spc Paystack Gateway Module</name>
 	<author>Douglas Kendyson</author>
-	<creationDate>28thMay2017</creationDate>
+	<creationDate>28th May 2017</creationDate>
 	<copyright>Copyright2017-Paystack</copyright>
 	<license>GNUGeneralPublicLicenseversion2orlaterseeLICENSE.txt</license>
 	<authorEmail>kendyson@kendyson.com</authorEmail>
@@ -15,7 +15,6 @@
 		<filename>helper.php</filename>
 		<filename>index.html</filename>
 		<folder>tmpl</folder>
-		<folder>sql</folder>
 	</files>
 
 	<config>
@@ -33,10 +32,5 @@
 			</fieldset>
 		</fields>
 	</config>
-	<install>
-	     <sql>
-	         <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
-	     </sql>
-	</install>
 
 </extension>

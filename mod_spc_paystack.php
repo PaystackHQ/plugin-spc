@@ -12,33 +12,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Include the login functions only once
 require_once __DIR__ . '/helper.php';
 
-// $params->def('greeting', 1);
-
-// $type	          = ModLoginHelper::getType();
-// $return	          = ModLoginHelper::getReturnUrl($params, $type);
-// $twofactormethods = ModLoginHelper::getTwoFactorMethods();
-// $user	          = JFactory::getUser();
-// $layout           = $params->get('layout', 'default');
-
-// // Logged users must load the logout sublayout
-// if (!$user->guest)
-// {
-
-// 	$layout .= '_logout';
-// }
-
-
-// print_r($settings);
-
-if ($params['paystack_mode'] == 0) {
-	$key = $params['paystack_tpk'];
-}
-echo $key;
-
-// require JModuleHelper::getLayoutPath('mod_spc_paystack', $layout);
-// Instantiate global document object
 $doc = JFactory::getDocument();
+
 $doc->addScript('https://js.paystack.co/v1/inline.js');
+$loadJquery = $params->get('loadJquery', 1);
+if ($loadJquery == '1') {
+	JHtml::_('jquery.framework');
+	$doc->addScript(JURI::root().'modules/mod_spc_paystack/tmpl/jquery.blockUI.min.js');
+}
 
 $js = <<<JS
 (function ($) {
@@ -49,6 +30,8 @@ $js = <<<JS
 			alert('Amount greater than 1 required');
 			return false;
 		}
+		$.blockUI({ message: 'Initializing Payment' });
+
 		$.ajax({
 			type   : 'POST',
 			data   : {
@@ -59,20 +42,22 @@ $js = <<<JS
 				'format' : 'json'
 			},
 			success: function (response) {
-				if (response.success){
+				$.unblockUI();
+				if (response.success && response.data.status == 'success'){
 					var data = response.data;
 					var names = data.name.split(' ');
 					var firstName = names[0] || "";
 					var lastName = names[1] || "";
 					var handler = PaystackPop.setup({
-	 					key: '$key',
+	 					key: data.key,
 	 					email: data.tx_email,
 	 					amount: data.koboamount,
 						firstname: firstName,
 						lastname: lastName,
-	 					ref: data.tx_reference,
+	 					ref: data.tx_rand_id,
 	 					callback: function(response){
-	 						$.ajax({
+	 						$.blockUI({ message: 'Verifying Payment' });
+		 					$.ajax({
 								type: 'POST',
 								data: {
 									'option' : 'com_ajax',
@@ -82,9 +67,12 @@ $js = <<<JS
 									'format' : 'json'
 								},
 								success: function (response) {
-									if (response.success){
-										console.log(response);
+									$.unblockUI();
+									if (response.success && response.data.status == 'success'){
+										alert(' Successful ');
 
+									}else{
+										alert(response.data.message);
 									}
 
 								}
@@ -97,6 +85,8 @@ $js = <<<JS
 	 				});
 	 				handler.openIframe();
 
+				}else{
+					alert(response.data.message);
 				}
 
 			}
