@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="2.5" type="module" client="site" method="upgrade">
+	<name>Spc Paystack Gateway Module</name>
+	<author>Douglas Kendyson</author>
+	<creationDate>28thMay2017</creationDate>
+	<copyright>Copyright2017-Paystack</copyright>
+	<license>GNUGeneralPublicLicenseversion2orlaterseeLICENSE.txt</license>
+	<authorEmail>kendyson@kendyson.com</authorEmail>
+	<authorUrl>https://github.com/kendysond</authorUrl>
+	<version>1.0</version>
+	<description>SPCforPaystack</description>
+
+	<files>
+		<filename module="mod_spc_paystack">mod_spc_paystack.php</filename>
+		<filename>helper.php</filename>
+		<filename>index.html</filename>
+		<folder>tmpl</folder>
+		<folder>sql</folder>
+	</files>
+
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field name="paystack_mode" type="radio" label="Mode" default="1" description="Paystack mode">
+					<option value="0">Test Mode</option>
+					<option value="1">Live Move</option>
+				</field>
+				<field name="paystack_tsk" type="text" label="Test Secret Key" default="sk_xxxxxxx" description="" />
+				<field name="paystack_tpk" type="text" label="Test Public Key" default="pk_xxxxx" description="" />
+				<field name="paystack_lsk" type="text" label="Live Secret Key" default="sk_xxxxxxx" description="" />
+				<field name="paystack_lpk" type="text" label="Live Public Key" default="pk_xxxxx" description="" />
+				
+			</fieldset>
+		</fields>
+	</config>
+	<install>
+	     <sql>
+	         <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+	     </sql>
+	</install>
+
+</extension>
