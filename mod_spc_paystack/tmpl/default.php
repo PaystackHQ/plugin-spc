@@ -1,11 +1,4 @@
 <?php
-/**
-* @package    Spc Paystack Plugin
-* @author     Douglas Kendyson
-* @copyright  Copyright2017-Paystack
-* @license    GNUGeneralPublicLicenseversion2orlaterseeLICENSE.txt
-**/
-
 // No direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 

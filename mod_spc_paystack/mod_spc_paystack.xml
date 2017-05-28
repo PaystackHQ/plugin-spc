@@ -8,7 +8,7 @@
 	<authorEmail>kendyson@kendyson.com</authorEmail>
 	<authorUrl>https://github.com/kendysond</authorUrl>
 	<version>1.0</version>
-	<description>SPCforPaystack</description>
+	<description>Paystack module for SPC</description>
 
 	<files>
 		<filename module="mod_spc_paystack">mod_spc_paystack.php</filename>
@@ -20,7 +20,7 @@
 	<config>
 		<fields name="params">
 			<fieldset name="basic">
-				<field name="paystack_mode" type="radio" label="Mode" default="1" description="Paystack mode">
+				<field name="paystack_mode" type="radio" label="Mode" default="0" description="Paystack mode">
 					<option value="0">Test Mode</option>
 					<option value="1">Live Move</option>
 				</field>

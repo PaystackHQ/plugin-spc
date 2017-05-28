@@ -1,21 +1,7 @@
 <?php
-/**
-* @package		JJ Module Generator
-* @author		JoomJunk
-* @copyright	Copyright (C) 2011 - 2012 JoomJunk. All Rights Reserved
-* @license		http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-/**
- * Helper for mod_login
- *
- * @package     Joomla.Site
- * @subpackage  mod_login
- *
- * @since       1.5
- */
+
 class ModSpcPaystackHelper{
 
 	public static function getAjax(){
@@ -34,14 +20,7 @@ class ModSpcPaystackHelper{
 		return $result;
 		
 	}
-	/**
-	 * Retrieve the url where the user should be returned after logging in
-	 *
-	 * @param   \Joomla\Registry\Registry  $params  module parameters
-	 * @param   string                     $type    return type
-	 *
-	 * @return string
-	 */
+	//Generate Transaction Reference
 	public static function generate_new_code($length = 10){
 	  $characters = '06EFGHI9KL'.time().'MNOPJRSUVW01YZ923234'.time().'ABCD5678QXT';
 	  $charactersLength = strlen($characters);
@@ -78,6 +57,8 @@ class ModSpcPaystackHelper{
 
 	  return $code;
 	}
+	//Initialize payment
+	
 	public static function initializePayment($units){
 		$user = JFactory::getUser();
 		if (!$user->guest){
@@ -130,11 +111,8 @@ class ModSpcPaystackHelper{
 		return $row;
 	}
 
-	/**
-	 * Returns the current users type
-	 *
-	 * @return string
-	 */
+	//Verify Payment
+	
 	public static function verifyPayment($reference)
 	{
 		$result = array( );
@@ -174,6 +152,8 @@ class ModSpcPaystackHelper{
 		return $result;
 		
 	}
+	//Get Module Params
+	
 	public static function getParams()
 	{
 		// $user = JFactory::getUser();
@@ -185,6 +165,8 @@ class ModSpcPaystackHelper{
 
 		
 	}
+	//Give units to customer
+	
 
 	public static function giveUnits($tx,$response)
 	{
@@ -225,6 +207,8 @@ class ModSpcPaystackHelper{
 
 		
 	}
+	//Get customer balance
+	
 	public static function getBalance($user = null)
 	{
 		
@@ -246,6 +230,8 @@ class ModSpcPaystackHelper{
 
 		
 	}
+	//Generate Multiplier for units
+	
 	public static function getMultiplier($amount)
 	{
 		$singlemultiplier = 1;
@@ -261,6 +247,8 @@ class ModSpcPaystackHelper{
 
 		
 	}
+	//Get all multipliers
+	
 	public static function getMultipliers()
 	{
 		
@@ -299,11 +287,8 @@ class ModSpcPaystackHelper{
 		
 	}
 
-	/**
-	 * Get list of available two factor methods
-	 *
-	 * @return array
-	 */
+	//Verify transaction was successful on Paystack 
+	
 	public static function verifyTransaction($reference)
 	{
 		$params = ModSpcPaystackHelper::getParams();

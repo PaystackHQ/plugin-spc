@@ -1,15 +1,7 @@
 <?php
-/**
-* @package    SpcPaystack
-* @author     DouglasKendyson
-* @copyright  Copyright2017-Paystack
-* @license    GNUGeneralPublicLicenseversion2orlaterseeLICENSE.txt
-**/
-
 // No direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// Include the login functions only once
 require_once __DIR__ . '/helper.php';
 
 $doc = JFactory::getDocument();
@@ -98,6 +90,7 @@ $js = <<<JS
 })(jQuery)
 JS;
 $doc->addScriptDeclaration($js);
+
 require JModuleHelper::getLayoutPath('mod_spc_paystack');
 
 ?>
