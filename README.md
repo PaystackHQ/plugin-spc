@@ -24,12 +24,15 @@ you are done with configuration and have successfully made a test payment.
 	<img src="screenshots/screenshot_step_4.png" alt="Step 4" width="650px"/>
 
 5. Create a new position by typing `spc_paystack` in the position field on the right side of the page. After creating it, save the module.
+	
 	<img src="screenshots/screenshot_step_5.png" alt="Step 5" width="650px"/>
 
 6. Create the article(page) that will be the **buy SMS** page. 
 	- Click on add new Article. 
+	
 	<img src="screenshots/screenshot_step_6_0.png" alt="Step 6" width="650px"/>
 	- On the article content, paste the text `{loadposition spc_paystack}`
+	
 	<img src="screenshots/screenshot_step_6.png" alt="Step 6" width="650px"/>
 
 7. Link the article(page) to your main menu: 
