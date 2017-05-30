@@ -47,6 +47,15 @@ $js = <<<JS
 						firstname: firstName,
 						lastname: lastName,
 	 					ref: data.tx_rand_id,
+	 					metadata: {
+					         custom_fields: [
+					            {
+					                display_name: "Description",
+					                variable_name: "description",
+					                value: data.tx_memo
+					            }
+					         ]
+					      },
 	 					callback: function(response){
 	 						$.blockUI({ message: 'Verifying Payment' });
 		 					$.ajax({
@@ -61,7 +70,20 @@ $js = <<<JS
 								success: function (response) {
 									$.unblockUI();
 									if (response.success && response.data.status == 'success'){
+										$.ajax({
+											type: 'POST',
+											data: {
+												'option' : 'com_ajax',
+												'module' : 'spc_paystack',
+												'reference' : response.data.reference,
+												'type': 'send_emails',
+												'format' : 'json'
+											},
+										success: function (response) {
+										}
+										});
 										alert('Payment Successful');
+
 										window.location.reload();
 
 									}else{

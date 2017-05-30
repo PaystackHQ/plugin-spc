@@ -11,11 +11,16 @@ class ModSpcPaystackHelper{
 		if ($type == 'initialize') {
 			$units  = $input->get('units');
 			$result = ModSpcPaystackHelper::initializePayment($units);
-		}else{
+		}elseif ($type == 'verify'){
 			$reference  = $input->get('reference');
 
 			$result = ModSpcPaystackHelper::verifyPayment($reference);
 			// $result = 
+		}else{
+			$reference  = $input->get('reference');
+
+			$result = ModSpcPaystackHelper::send_emails($reference);
+
 		}
 		return $result;
 		
@@ -103,6 +108,8 @@ class ModSpcPaystackHelper{
 			$row->tx_multiplier = $multiplier;
 			$row->key = $key;
 			$row->status = 'success';
+			$row->tx_memo = $units.' units of SMS.  @ '.$multiplier.' per unit';
+			
 			
 		}else{
 			$row  = array('status' => "failed", 'message' => 'You must be logged in to continue');
@@ -135,7 +142,7 @@ class ModSpcPaystackHelper{
 					$amount = $api_response['amount'];
 					if ($amount == $tx->tx_amount) {
 						$value_given = ModSpcPaystackHelper::giveUnits($tx,$api_response['response']);
-						$result = array('status' => "success", 'message' => 'Payment was successful');
+						$result = array('status' => "success", 'message' => 'Payment was successful','reference' => $reference);
 					}else{
 						$result = array('status' => "failed", 'message' => 'Invalid amount paid');
 					}
@@ -322,5 +329,44 @@ class ModSpcPaystackHelper{
 
         }
         return $result;
+	}
+	public static function send_emails($reference)
+	{
+		$result = array( );
+		$db = JFactory::getDBO();
+		$config = JFactory::getConfig();
+
+		$query = $db->getQuery(true)
+		            ->select('*')
+		            ->from($db->quoteName('#__spc_transactions'))
+		            ->where('tx_rand_id = ' . $db->quote($reference));
+		$db->setQuery($query);
+		$transaction = $db->loadObjectList(); 
+		$tx = $transaction[0];
+
+		$params = ModSpcPaystackHelper::getParams();
+		
+		if ($params['paystack_email_customer'] == 1) {
+			$mailer = JFactory::getMailer();
+
+			$sender = array( 
+			    $config->get( 'mailfrom' ),
+	    		$config->get( 'fromname' )
+			);
+			$user = JFactory::getUser($tx->tx_user_id);
+			
+			$mailer->setSender($sender);
+			$mailer->addRecipient($user->email);
+			$mailer->setSubject('Account notification from '.$config->get( 'fromname' ));
+
+			$fcontent = "Hello ".ucfirst($user->username).", You've been credited ".$tx->tx_unit." units & your new balance is ".$tx->tx_balance_after.".";
+			$fcontent.= "\n\n Thank you for paying with Paystack.";
+			$mailer->setBody($fcontent);
+
+			$send = $mailer->Send();
+		}
+		
+
+       
 	}
 }

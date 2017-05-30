@@ -28,7 +28,10 @@
 				<field name="paystack_tpk" type="text" label="Test Public Key" default="pk_xxxxx" description="" />
 				<field name="paystack_lsk" type="text" label="Live Secret Key" default="sk_xxxxxxx" description="" />
 				<field name="paystack_lpk" type="text" label="Live Public Key" default="pk_xxxxx" description="" />
-				
+				<field name="paystack_email_customer" type="radio" label="Send Emails to Customer" default="0" description="Send Emails to Customer on every payment">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
 			</fieldset>
 		</fields>
 	</config>
