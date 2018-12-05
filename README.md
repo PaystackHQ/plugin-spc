@@ -1,6 +1,10 @@
-# Paystack SPC(sms portal creator) Module
-Tested on SPC4 
+<p align="center"><a href="https://paystack.com/"><img src="https://raw.githubusercontent.com/PaystackHQ/wordpress-payment-forms-for-paystack/master/icon.png" alt="Payment Forms for Paystack"></a></p>
 
+# SPC(SMS Portal Creator) Plugin for Paystack
+
+Welcome to the SMS Portal Creator Plugin for Paystack repository on GitHub. 
+
+Here you can browse the source, look at open issues and keep track of development.
 
 ## Prepare
 
@@ -9,7 +13,7 @@ Tested on SPC4
 you are done with configuration and have successfully made a test payment.
 
 
-## Installation Steps
+## Installation
 
 1. Download the [mod_spc_paystack.zip][link-releases] and install via your Joomla Mange extensions page. 
 	<img src="screenshots/screenshot_step_1.png" alt="Step 1" width="650px"/>
@@ -53,6 +57,16 @@ you are done with configuration and have successfully made a test payment.
 ## Notes 
 I think step 6-10 can be optimized to be easier, my Joomla knowledge is weak. Please feel free to share your suggestions and send Pull Requests. 
 
-[link-developer]: https://dashboard.paystack.co/#/settings/developer
-[link-signup]: https://dashboard.paystack.co/#/signup
-[link-releases]: https://github.com/Kendysond/Paystack-SPC-module/releases
+## Support
+For bug reports and feature requests directly related to this plugin, please use the [issue tracker](https://github.com/PaystackHQ/paystack-payment-forms-for-wordpress/issues). 
+
+For questions related to using the plugin, please post an inquiry to the plugin [support forum](https://wordpress.org/support/plugin/payment-forms-for-paystack).
+
+For general support or questions about your Paystack account, you can reach out by sending a message from [our website](https://paystack.com/contact).
+
+## Community
+If you are a developer, please join our Developer Community on [Slack](https://slack.paystack.com).
+
+## Contributing to Payment Forms for Paystack
+
+If you have a patch or have stumbled upon an issue with the Paystack Gateway for Paid Membership Pro plugin, you can contribute this back to the code. Please read our [contributor guidelines](https://github.com/PaystackHQ/wordpress-payment-forms-for-paystack/blob/master/CONTRIBUTING.md) for more information how you can do this.
