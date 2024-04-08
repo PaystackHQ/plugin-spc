@@ -10,7 +10,7 @@ We regret to inform you that the Paystack SPC(sms portal creator) Module is now 
 - Security vulnerabilities that cannot be addressed sufficiently.
 - Obsolete functionality that is no longer relevant
 
-To ensure a seamless experience, we recommend exploring the Paystack Integration Directory for [alternative plugins](https://paystack.com/integrations?category=automation) that are actively maintained and supported.
+To ensure a seamless experience, we recommend exploring the Paystack Integrations Directory for [alternative plugins](https://paystack.com/integrations?category=automation) that are actively maintained and supported.
 
 
 ## Prepare
