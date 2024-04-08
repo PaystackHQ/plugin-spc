@@ -1,6 +1,17 @@
 # Paystack SPC(sms portal creator) Module
 Tested on SPC4 
 
+## **Deprecation Notice**
+
+We regret to inform you that the Paystack SPC(sms portal creator) Module is now deprecated and will no longer be actively maintained or supported.
+
+**Reasons for deprecation**:
+- Compatibility issues with the latest software versions
+- Security vulnerabilities that cannot be addressed sufficiently.
+- Obsolete functionality that is no longer relevant
+
+To ensure a seamless experience, we recommend exploring the Paystack Integration Directory for [alternative plugins](https://paystack.com/integrations?category=automation) that are actively maintained and supported.
+
 
 ## Prepare
 
